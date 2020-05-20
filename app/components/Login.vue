@@ -1,87 +1,76 @@
-<template>
-	<Page>
-		<FlexboxLayout class="page">
-			<StackLayout class="form">
-				<Label class="header" text="Permit Scanner" />
-
-				<StackLayout class="input-field" marginBottom="25">
-					<TextField class="input" hint="Email" keyboardType="email" autocorrect="false" autocapitalizationType="none" v-model="user.email"
-					 returnKeyType="next" @returnPress="focusPassword" fontSize="18" />
-					<StackLayout class="hr-light" />
-				</StackLayout>
-
-				<StackLayout class="input-field" marginBottom="25">
-					<TextField ref="password" class="input" hint="Password" secure="true" v-model="user.password" returnKeyType="done" fontSize="18" />
-					<StackLayout class="hr-light" />
-				</StackLayout>
-
-				<Button text="Log In" @tap="submit" class="btn btn-primary m-t-20" />
-			</StackLayout>
-		</FlexboxLayout>
-	</Page>
+<template lang="html">
+    <Page @loaded="checkToken" class="page">
+        <ActionBar title="Login" />
+        <StackLayout class="form">
+            <Label class="header" text="Permit Scanner" />
+            <StackLayout class="input-field" marginBottom="25">
+                <TextField class="input" v-model="email" hint="Email Address" keyboardType="email" autocorrect="false" 
+                autocapitalizationType="none" returnKeyType="next" fontSize="18"/>
+                <StackLayout class="hr-light" />
+            </StackLayout>
+            <StackLayout class="input-field" marginBottom="25">
+                <TextField class="input" v-model="password" hint="Password" secure="true" returnKeyType="done" fontSize="18"/>
+                <StackLayout class="hr-light" />
+            </StackLayout>
+            <Button text="Login" @tap="login" class="btn btn-primary m-t-20"  fontSize="18" />
+        </StackLayout>
+    </Page>
 </template>
 
 <script>
-import {App} from './App';
-
-// A stub for a service that authenticates users.
-const userService = {
-    register(user) {
-        return Promise.resolve(user);
-    },
-    login(user) {
-        return Promise.resolve(user);
-    },
-    resetPassword(email) {
-        return Promise.resolve(email);
-    }
-};
+import App from "./App";
 
 export default {
-    data() {
-        return {
-            user: {
-                email: "foo@foo.com",
-                password: "foo",
-                confirmPassword: "foo"
-            }
-        };
+  data() {
+    return {
+      email: "",
+      password: ""
+    };
+  },
+  methods: {
+    checkToken() {
+      this.$store.dispatch("loadFromStorage");
+
+      if (this.$store.state.token) {
+        this.$navigateTo(App, {
+          clearHistory: true
+        });
+      }
     },
-    methods: {
-        submit() {
-            if (!this.user.email || !this.user.password) {
-                this.alert(
-                    "Please provide both an email address and password."
-                );
-                return;
-            }
-            
-            this.login();
-        },
+    
+    async login() {
+      const formData = new FormData();
+      const params = {
+        grant_type: "password",
+        client_id: "2",
+        client_secret: "EmdG0FIDO6hBTH5T2PqVFiCUzFZMa0fyk6nloDPZ",
+        username: this.email,
+        password: this.password,
+        scope: "*"
+      };
 
-        login() {
-            userService
-                .login(this.user)
-                .then(() => {
-                    this.$navigateTo(App);
-                })
-                .catch(() => {
-                    this.alert("Unfortunately we could not find your account.");
-                });
-        },
+      for (const name in params) {
+        formData.append(name, params[name]);
+      }
 
-        focusPassword() {
-            this.$refs.password.nativeView.focus();
+      fetch("https://43ad44f9.ngrok.io/oauth/token", {
+        method: "POST",
+        headers: {
+          Accept: "application/json"
         },
-
-        alert(message) {
-            return alert({
-                title: "APP NAME",
-                okButtonText: "OK",
-                message: message
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          this.$store.dispatch("setUser", data.access_token).then(() => {
+            this.$navigateTo(App, {
+              clearHistory: true
             });
-        }
+          });
+        })
+        .catch(error => console.error("Error:", error));
     }
+  }
 };
 </script>
 
@@ -91,26 +80,20 @@ export default {
 		flex-direction: column;
 	}
 
-	.form {
-		margin-left: 30;
-		margin-right: 30;
-		flex-grow: 2;
-		vertical-align: middle;
-	}
-
-	.logo {
-		margin-bottom: 12;
-		height: 90;
-		font-weight: bold;
-	}
-
-	.header {
+    .header {
 		horizontal-align: center;
 		font-size: 25;
 		font-weight: 600;
 		margin-bottom: 70;
 		text-align: center;
-		color: #D51A1A;
+		color: #53ba82;
+	}
+
+	.form {
+		margin-left: 20;
+		margin-right: 20;
+		flex-grow: 2;
+		vertical-align: middle;
 	}
 
 	.input-field {
@@ -129,20 +112,11 @@ export default {
 	.btn-primary {
 		height: 50;
 		margin: 30 5 15 5;
-		background-color: #D51A1A;
+		background-color: #53ba82;
+        color: #ffffff;
 		border-radius: 5;
 		font-size: 20;
 		font-weight: 600;
-	}
-
-	.login-label {
-		horizontal-align: center;
-		color: #A8A8A8;
-		font-size: 16;
-	}
-
-	.sign-up-label {
-		margin-bottom: 20;
 	}
 
 	.bold {

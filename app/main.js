@@ -1,16 +1,15 @@
-import Vue from 'nativescript-vue'
-import App from './components/App'
-import Login from './components/Login'
 import VueDevtools from 'nativescript-vue-devtools'
+import Vue from 'nativescript-vue'
+import Login from './components/Login'
 
-if(TNS_ENV !== 'production') {
-  Vue.use(VueDevtools)
+if (TNS_ENV !== 'production') {
+  Vue.use(VueDevtools, { host: '192.168.0.122' })
 }
-import store from './store'
+
+import store from './store/store'
 
 // Prints Vue logs when --env.production is *NOT* set while building
 Vue.config.silent = (TNS_ENV === 'production')
-// Vue.registerElement('BarcodeScanner', () => require('nativescript-barcodescanner').BarcodeScannerView)
 
 Vue.registerElement(
   'PullToRefresh',
@@ -19,5 +18,8 @@ Vue.registerElement(
 
 new Vue({
   store,
-  render: h => h('frame', [h(App)])
+  render: h => h('frame', [h(Login)]),
+  created() {
+    // this.$store.dispatch("init")
+  },
 }).$start()
