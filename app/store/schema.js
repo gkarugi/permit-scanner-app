@@ -4,9 +4,7 @@ import { schema } from 'normalizr';
 export const occupant = new schema.Entity('occupants');
 
 // Define a vehicles schema
-export const vehicle = new schema.Entity('vehicles', {
-    occupants: [occupant]
-});
+export const vehicle = new schema.Entity('vehicles');
 
 // Define a permits schema
 export const permit = new schema.Entity('permits');
@@ -15,6 +13,7 @@ export const permit = new schema.Entity('permits');
 export const scan = new schema.Entity('scans', {
   vehicle: vehicle,
   permit: permit,
+  occupants: [occupant]
 });
 
-export const scans = new schema.Array(scan);
+export const scansArray = new schema.Array(scan);

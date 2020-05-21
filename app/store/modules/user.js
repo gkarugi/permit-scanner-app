@@ -5,6 +5,12 @@ export default {
         token: false,
     },  
 
+    getters: {
+        token: state => {
+            return state.token
+        }
+    },
+
     mutations: {
         setUser(state, token) {
             state.token = token

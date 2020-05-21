@@ -4,6 +4,7 @@ import Login from './components/Login'
 
 if (TNS_ENV !== 'production') {
   Vue.use(VueDevtools, { host: '192.168.0.122' })
+  // Vue.use(VueDevtools)
 }
 
 import store from './store/store'

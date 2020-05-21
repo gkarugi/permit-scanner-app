@@ -43,7 +43,7 @@ export default {
       const params = {
         grant_type: "password",
         client_id: "2",
-        client_secret: "EmdG0FIDO6hBTH5T2PqVFiCUzFZMa0fyk6nloDPZ",
+        client_secret: "A2oOvVQ2ApU1FOIJKvsZUhbeD7O85yQCoMT0ZFCE",
         username: this.email,
         password: this.password,
         scope: "*"
@@ -53,12 +53,22 @@ export default {
         formData.append(name, params[name]);
       }
 
-      fetch("https://43ad44f9.ngrok.io/oauth/token", {
+      fetch("https://permits.centrisign.co.ke/oauth/token", {
         method: "POST",
         headers: {
           Accept: "application/json"
         },
         body: formData
+      }).then(function(response) {
+         if (!response.ok) {
+              alert({
+                  title: "Authentication failed ",
+                  message: "Invalid email/password",
+                  okButtonText: "OK"
+              });
+          } else {
+              return response;
+          }
       })
         .then(response => response.json())
         .then(data => {
@@ -67,8 +77,7 @@ export default {
               clearHistory: true
             });
           });
-        })
-        .catch(error => console.error("Error:", error));
+        }).catch(error => console.error("Error:", error));
     }
   }
 };
